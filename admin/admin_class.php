@@ -247,59 +247,63 @@ Class Action {
 		if($update)
 			return 1;
 	}
-	function save_gallery(){
+	function save_article() {
 		extract($_POST);
 		$img = array();
-  		$fpath = 'assets/uploads/gallery';
-		$files= is_dir($fpath) ? scandir($fpath) : array();
-		foreach($files as $val){
-			if(!in_array($val, array('.','..'))){
-				$n = explode('_',$val);
+		$fpath = 'assets/uploads/article';
+		$files = is_dir($fpath) ? scandir($fpath) : array();
+		foreach ($files as $val) {
+			if (!in_array($val, array('.', '..'))) {
+				$n = explode('_', $val);
 				$img[$n[0]] = $val;
 			}
 		}
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO gallery set about = '$about' ");
-			if($save){
+	
+		$folder = "assets/uploads/article/";
+		$file_path = '';
+		if ($_FILES['img']['tmp_name'] != '') {
+			$file = explode('.', $_FILES['img']['name']);
+			$file_extension = end($file);
+			$file_path = $folder . $id . '_img.' . $file_extension;
+			if (is_file($file_path)) {
+				unlink($file_path);
+			}
+		}
+	
+		if (empty($id)) {
+			$save = $this->db->query("INSERT INTO articles (title, content, linkname, img) VALUES ('$title', '$content', '$linkname' , '$file_path')");
+			if ($save) {
 				$id = $this->db->insert_id;
-				$folder = "assets/uploads/gallery/";
-				$file = explode('.',$_FILES['img']['name']);
-				$file = end($file);
-				if(is_file($folder.$id.'/_img'.'.'.$file))
-					unlink($folder.$id.'/_img'.'.'.$file);
-				if(isset($img[$id]))
-						unlink($folder.$img[$id]);
-				if($_FILES['img']['tmp_name'] != ''){
-					$fname = $id.'_img'.'.'.$file;
-					$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/gallery/'. $fname);
+				if ($_FILES['img']['tmp_name'] != '') {
+					$fname = $id . '_img.' . $file_extension;
+					$move = move_uploaded_file($_FILES['img']['tmp_name'], $folder . $fname);
+					$this->db->query("UPDATE articles SET img = '$folder$fname' WHERE id = $id");
 				}
 			}
-		}else{
-			$save = $this->db->query("UPDATE gallery set about = '$about' where id=".$id);
-			if($save){
-				if($_FILES['img']['tmp_name'] != ''){
-					$folder = "assets/uploads/gallery/";
-					$file = explode('.',$_FILES['img']['name']);
-					$file = end($file);
-					if(is_file($folder.$id.'/_img'.'.'.$file))
-						unlink($folder.$id.'/_img'.'.'.$file);
-					if(isset($img[$id]))
-						unlink($folder.$img[$id]);
-					$fname = $id.'_img'.'.'.$file;
-					$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/gallery/'. $fname);
-				}
+		} else {
+			$save = $this->db->query("UPDATE articles SET title = '$title', content = '$content', linkname = '$linkname', img = '$file_path' WHERE id = $id");
+			if ($save && $_FILES['img']['tmp_name'] != '') {
+				$fname = $id . '_img.' . $file_extension;
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], $folder . $fname);
+				$this->db->query("UPDATE articles SET img = '$folder$fname' WHERE id = $id");
 			}
 		}
-		if($save)
+		if ($save) {
 			return 1;
+		}
 	}
-	function delete_gallery(){
+	function delete_article() {
 		extract($_POST);
-		$delete = $this->db->query("DELETE FROM gallery where id = ".$id);
-		if($delete){
+		$article = $this->db->query("SELECT img FROM articles WHERE id = $id")->fetch_assoc();
+		$delete = $this->db->query("DELETE FROM articles WHERE id = $id");
+		if ($delete) {
+			if (isset($article['img']) && is_file($article['img'])) {
+				unlink($article['img']);
+			}
 			return 1;
 		}
 	}
+	
 	function save_career(){
 		extract($_POST);
 		$data = " company = '$company' ";

@@ -101,7 +101,7 @@
                     <a class="nav-link" href="index.php?page=home">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="index.php?page=gallery">Gallery</a>
+                    <a class="nav-link" href="index.php?page=gallery">Articles</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=courses">Course List</a>
