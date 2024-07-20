@@ -76,18 +76,18 @@ include 'admin/db_connect.php';
     <div class="col-lg-4 mt-3 pt-2" style="background-color:cyan;">
         <h4 class="text-center ">Upcoming Events</h4>
         <?php
-        $event = $conn->query("SELECT * FROM events where date_format(schedule,'%Y-%m%-d') >= '" . date('Y-m-d') . "' order by unix_timestamp(schedule) asc");
-        while ($row = $event->fetch_assoc()):
-            $trans = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
-            unset($trans["\""], $trans["<"], $trans[">"], $trans["<h2"]);
-            $desc = strtr(html_entity_decode($row['content']), $trans);
-            $desc = str_replace(array("<li>", "</li>"), array("", ","), $desc);
-            ?>
-            <div class="card event-list" data-id="<?php echo $row['id'] ?>">
-                <div class='banner'>
-                    <?php if (!empty($row['banner'])): ?>
-                        <img src="admin/assets/uploads/<?php echo ($row['banner']) ?>" alt="">
-                    <?php endif; ?>
+                $event = $conn->query("SELECT * FROM events where date_format(schedule,'%Y-%m%-d') >= '".date('Y-m-d')."' order by unix_timestamp(schedule) asc");
+                while($row = $event->fetch_assoc()):
+                    $trans = get_html_translation_table(HTML_ENTITIES,ENT_QUOTES);
+                    unset($trans["\""], $trans["<"], $trans[">"], $trans["<h2"]);
+                    $desc = strtr(html_entity_decode($row['content']),$trans);
+                    $desc=str_replace(array("<li>","</li>"), array("",","), $desc);
+                ?>
+                <div class="card event-list" data-id="<?php echo $row['id'] ?>">
+                     <div class='banner'>
+                        <?php if(!empty($row['banner'])): ?>
+                            <img src="admin/assets/uploads/<?php echo($row['banner']) ?>" alt="">
+                        <?php endif; ?>
                 </div>
                 <div class="card-body">
                     <div class="row  align-items-center justify-content-center text-center h-100">
