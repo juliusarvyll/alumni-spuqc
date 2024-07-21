@@ -24,9 +24,9 @@ ini_set('display_errors', 1);
         background-color: #025F1D;
     }
 
-    .navbar {
+    nav .navbar {
+        padding:100rem;
         width: 100%;
-        height: 6.3rem;
         background-color: #ffffff;
         color: #343a40;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -47,12 +47,10 @@ ini_set('display_errors', 1);
     @keyframes slideIn {
         0% {
             margin-left: -50rem;
-            /* Start position off the screen to the left */
         }
 
         100% {
             margin-left: 10rem;
-            /* End position where you want the logo to settle */
         }
     }
 
@@ -98,7 +96,6 @@ ini_set('display_errors', 1);
 
         .navbar-nav-center {
             justify-content: center;
-            /* Center the login link */
         }
 
         .navbar-nav {
@@ -115,20 +112,16 @@ ini_set('display_errors', 1);
         @keyframes slideIn {
             0% {
                 margin-left: -50rem;
-                /* Start position off the screen to the left */
             }
 
             100% {
                 margin-left: 1.5rem;
-                /* End position where you want the logo to settle */
             }
         }
 
         .hero-left {
             align-items: center !important;
-            /* Center the content vertically */
             text-align: center !important;
-            /* Center the text horizontally */
         }
     }
 
@@ -207,15 +200,6 @@ ini_set('display_errors', 1);
     }
 
 
-
-    /* a.jqte_tool_label.unselectable {
-    height: auto !important;
-    min-width: 4rem !important;
-    padding:5px
-}/* */
-    /* a.jqte_tool_label.unselectable {
-    height: 22px !important;
-}*/
 </style>
 
 <body id="page-top">
@@ -227,16 +211,15 @@ ini_set('display_errors', 1);
     <div class="greentop"></div>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="./">
-            <img src="assets/img/Logo.png" alt="logo" class="logo-animation">
-        </a>
-        <?php if (isset($_SESSION['login_id'])): ?>
-            <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav navbar-nav-center" style=""></ul>
+    <a class="navbar-brand" href="./">
+        <img src="assets/img/Logo.png" alt="logo">
+    </a>
+    <?php if (isset($_SESSION['login_id'])): ?>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=home">Home</a>
                 </li>
@@ -244,7 +227,7 @@ ini_set('display_errors', 1);
                     <a class="nav-link" href="index.php?page=alumni_list">Alumni</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="index.php?page=gallery">Article</a>
+                    <a class="nav-link" href="index.php?page=articles">Article</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=careers">Events</a>
@@ -258,30 +241,26 @@ ini_set('display_errors', 1);
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=contact_us">Contact Us</a>
                 </li>
-                <div class="nav-link login">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle " href="#" id="account_settings" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <?php echo $_SESSION['login_name'] ?>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="account_settings">
-                            <a class="dropdown-item" href="index.php?page=my_account" id="manage_my_account">Manage
-                                Account</a>
-                            <a class="dropdown-item" href="admin/ajax.php?action=logout2">Logout</a>
-                        </div>
-                    </li>
-                </div>
-
-                </ul>
-            </div>
-        <?php endif; ?>
-    </nav>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="account_settings" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <?php echo $_SESSION['login_name'] ?>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="account_settings">
+                        <a class="dropdown-item" href="index.php?page=my_account" id="manage_my_account">Manage Account</a>
+                        <a class="dropdown-item" href="admin/ajax.php?action=logout2">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    <?php endif; ?>
+</nav>
+     
    
     <?php 
         $page = isset($_GET['page']) ? $_GET['page'] : "home";
     ?>
     <?php if (isset($_SESSION['login_id'])):
-        $allowed_pages = ['home', 'alumni_list', 'gallery', 'careers', 'forum', 'about', 'my_account', 'contact_us', 'signup', ''];
+        $allowed_pages = ['home', 'alumni_list', 'articles', 'careers', 'forum', 'about', 'my_account', 'contact_us', 'signup', ''];
         if (in_array($page, $allowed_pages) && file_exists($page . '.php')) {
             include $page . '.php';
         } else {
