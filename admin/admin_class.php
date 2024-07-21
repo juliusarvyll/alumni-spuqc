@@ -37,26 +37,25 @@ Class Action {
 			}
 	}
 	function login2(){
-		
-			extract($_POST);
-			if(isset($email))
-				$username = $email;
+		extract($_POST);
+		if(isset($email))
+			$username = $email;
 		$qry = $this->db->query("SELECT * FROM users where username = '".$username."' and password = '".md5($password)."' ");
 		if($qry->num_rows > 0){
 			foreach ($qry->fetch_array() as $key => $value) {
-				if($key != 'passwors' && !is_numeric($key))
+				if($key != 'password' && !is_numeric($key))
 					$_SESSION['login_'.$key] = $value;
 			}
-			if($_SESSION['login_alumnus_id'] > 0){
+			if(isset($_SESSION['login_alumnus_id']) && $_SESSION['login_alumnus_id'] > 0){
 				$bio = $this->db->query("SELECT * FROM alumnus_bio where id = ".$_SESSION['login_alumnus_id']);
 				if($bio->num_rows > 0){
 					foreach ($bio->fetch_array() as $key => $value) {
-						if($key != 'passwors' && !is_numeric($key))
+						if($key != 'password' && !is_numeric($key))
 							$_SESSION['bio'][$key] = $value;
 					}
 				}
 			}
-			if($_SESSION['bio']['status'] != 1){
+			if(isset($_SESSION['bio']) && $_SESSION['bio']['status'] != 1){
 					foreach ($_SESSION as $key => $value) {
 						unset($_SESSION[$key]);
 					}
@@ -118,39 +117,33 @@ Class Action {
 		$data = " name = '".$firstname.' '.$lastname."' ";
 		$data .= ", username = '$email' ";
 		$data .= ", password = '".md5($password)."' ";
-		$chk = $this->db->query("SELECT * FROM users where username = '$email' ")->num_rows;
-		if($chk > 0){
-			return 2;
+		$chk = $this->db->query("SELECT * FROM users WHERE username = '$email'")->num_rows;
+		if ($chk > 0) {
+			return 2; // Username already exists
 			exit;
 		}
-			$save = $this->db->query("INSERT INTO users set ".$data);
-		if($save){
+		$save = $this->db->query("INSERT INTO users SET $data");
+		if ($save) {
 			$uid = $this->db->insert_id;
-			$data = '';
-			foreach($_POST as $k => $v){
-				if($k =='password')
-					continue;
-				if(empty($data) && !is_numeric($k) )
-					$data = " $k = '$v' ";
-				else
-					$data .= ", $k = '$v' ";
-			}
-			if($_FILES['img']['tmp_name'] != ''){
-							$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
-							$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/'. $fname);
-							$data .= ", avatar = '$fname' ";
-
-			}
-			$save_alumni = $this->db->query("INSERT INTO alumnus_bio set $data ");
-			if($data){
+			$alumnus_data = "firstname = '$firstname', middlename = '$middlename', lastname = '$lastname', 
+							 gender = '$gender', batch = '$batch', course_id = '$course_id', 
+							 email = '$email', connected_to = '$connected_to', avatar = '$avatar', 
+							 status = '1' , studentId = '$studentId', homeAddress = '$homeAddress', mobileNumber = '$mobileNumber',
+							 kinderSchool = '$kinderSchool', gradeSchool = '$gradeSchool', gradeSchoolYear = '$gradeSchoolYear',
+							 juniorHighSchool = '$juniorHighSchool',juniorHighSchoolYear = '$juniorHighSchoolYear', college = '$college',
+							 collegeYear = '$collegeYear', postGrad = '$postGrad', postGradYear = '$postGradYear'";
+			$insert_query = "INSERT INTO alumnus_bio SET $alumnus_data";
+			$this->db->query($insert_query);
+			if ($this->db->affected_rows > 0) {
 				$aid = $this->db->insert_id;
-				$this->db->query("UPDATE users set alumnus_id = $aid where id = $uid ");
+				$this->db->query("UPDATE users SET alumnus_id = $aid WHERE id = $uid");
 				$login = $this->login2();
-				if($login)
-				return 1;
+				if ($login) return 1;
 			}
 		}
+		return 0;
 	}
+	
 	function update_account(){
 		extract($_POST);
 		$data = " name = '".$firstname.' '.$lastname."' ";
