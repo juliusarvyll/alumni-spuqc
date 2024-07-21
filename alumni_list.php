@@ -35,10 +35,7 @@ span.hightlight{
 .carousel,.carousel-inner,.carousel-item{
    min-height: calc(100%)
 }
-header.masthead,header.masthead:before {
-        min-height: 50vh !important;
-        height: 50vh !important
-    }
+
 .row-items{
     position: relative;
 }
@@ -67,11 +64,10 @@ header.masthead,header.masthead:before {
 	margin:unset;
 }
 </style>
-        <header class="masthead">
-            <div class="container-fluid h-100">
+            <div class="container-fluid mt-5">
                 <div class="row h-100 align-items-center justify-content-center text-center">
                     <div class="col-lg-8 align-self-end mb-4 page-title">
-                        <h3 class="text-white">Alumnus/Alumnae List</h3>
+                        <h3 class=" ">Alumnus/Alumnae List</h3>
                         <hr class="divider my-4" />
 
                     <div class="col-md-12 mb-2 justify-content-center">
@@ -80,7 +76,6 @@ header.masthead,header.masthead:before {
                     
                 </div>
             </div>
-        </header>
         	<div class="container">
         		<div class="card mb-4 mt-4">
 		        <div class="card-body">

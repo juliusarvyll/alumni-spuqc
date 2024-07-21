@@ -37,26 +37,25 @@ Class Action {
 			}
 	}
 	function login2(){
-		
-			extract($_POST);
-			if(isset($email))
-				$username = $email;
+		extract($_POST);
+		if(isset($email))
+			$username = $email;
 		$qry = $this->db->query("SELECT * FROM users where username = '".$username."' and password = '".md5($password)."' ");
 		if($qry->num_rows > 0){
 			foreach ($qry->fetch_array() as $key => $value) {
-				if($key != 'passwors' && !is_numeric($key))
+				if($key != 'password' && !is_numeric($key))
 					$_SESSION['login_'.$key] = $value;
 			}
-			if($_SESSION['login_alumnus_id'] > 0){
+			if(isset($_SESSION['login_alumnus_id']) && $_SESSION['login_alumnus_id'] > 0){
 				$bio = $this->db->query("SELECT * FROM alumnus_bio where id = ".$_SESSION['login_alumnus_id']);
 				if($bio->num_rows > 0){
 					foreach ($bio->fetch_array() as $key => $value) {
-						if($key != 'passwors' && !is_numeric($key))
+						if($key != 'password' && !is_numeric($key))
 							$_SESSION['bio'][$key] = $value;
 					}
 				}
 			}
-			if($_SESSION['bio']['status'] != 1){
+			if(isset($_SESSION['bio']) && $_SESSION['bio']['status'] != 1){
 					foreach ($_SESSION as $key => $value) {
 						unset($_SESSION[$key]);
 					}
@@ -118,39 +117,33 @@ Class Action {
 		$data = " name = '".$firstname.' '.$lastname."' ";
 		$data .= ", username = '$email' ";
 		$data .= ", password = '".md5($password)."' ";
-		$chk = $this->db->query("SELECT * FROM users where username = '$email' ")->num_rows;
-		if($chk > 0){
-			return 2;
+		$chk = $this->db->query("SELECT * FROM users WHERE username = '$email'")->num_rows;
+		if ($chk > 0) {
+			return 2; // Username already exists
 			exit;
 		}
-			$save = $this->db->query("INSERT INTO users set ".$data);
-		if($save){
+		$save = $this->db->query("INSERT INTO users SET $data");
+		if ($save) {
 			$uid = $this->db->insert_id;
-			$data = '';
-			foreach($_POST as $k => $v){
-				if($k =='password')
-					continue;
-				if(empty($data) && !is_numeric($k) )
-					$data = " $k = '$v' ";
-				else
-					$data .= ", $k = '$v' ";
-			}
-			if($_FILES['img']['tmp_name'] != ''){
-							$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
-							$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/'. $fname);
-							$data .= ", avatar = '$fname' ";
-
-			}
-			$save_alumni = $this->db->query("INSERT INTO alumnus_bio set $data ");
-			if($data){
+			$alumnus_data = "firstname = '$firstname', middlename = '$middlename', lastname = '$lastname', 
+							 gender = '$gender', batch = '$batch', course_id = '$course_id', 
+							 email = '$email', connected_to = '$connected_to', avatar = '$avatar', 
+							 status = '1' , studentId = '$studentId', homeAddress = '$homeAddress', mobileNumber = '$mobileNumber',
+							 kinderSchool = '$kinderSchool', gradeSchool = '$gradeSchool', gradeSchoolYear = '$gradeSchoolYear',
+							 juniorHighSchool = '$juniorHighSchool',juniorHighSchoolYear = '$juniorHighSchoolYear', college = '$college',
+							 collegeYear = '$collegeYear', postGrad = '$postGrad', postGradYear = '$postGradYear'";
+			$insert_query = "INSERT INTO alumnus_bio SET $alumnus_data";
+			$this->db->query($insert_query);
+			if ($this->db->affected_rows > 0) {
 				$aid = $this->db->insert_id;
-				$this->db->query("UPDATE users set alumnus_id = $aid where id = $uid ");
+				$this->db->query("UPDATE users SET alumnus_id = $aid WHERE id = $uid");
 				$login = $this->login2();
-				if($login)
-				return 1;
+				if ($login) return 1;
 			}
 		}
+		return 0;
 	}
+	
 	function update_account(){
 		extract($_POST);
 		$data = " name = '".$firstname.' '.$lastname."' ";
@@ -247,59 +240,63 @@ Class Action {
 		if($update)
 			return 1;
 	}
-	function save_gallery(){
+	function save_article() {
 		extract($_POST);
 		$img = array();
-  		$fpath = 'assets/uploads/gallery';
-		$files= is_dir($fpath) ? scandir($fpath) : array();
-		foreach($files as $val){
-			if(!in_array($val, array('.','..'))){
-				$n = explode('_',$val);
+		$fpath = 'assets/uploads/article';
+		$files = is_dir($fpath) ? scandir($fpath) : array();
+		foreach ($files as $val) {
+			if (!in_array($val, array('.', '..'))) {
+				$n = explode('_', $val);
 				$img[$n[0]] = $val;
 			}
 		}
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO gallery set about = '$about' ");
-			if($save){
+	
+		$folder = "assets/uploads/article/";
+		$file_path = '';
+		if ($_FILES['img']['tmp_name'] != '') {
+			$file = explode('.', $_FILES['img']['name']);
+			$file_extension = end($file);
+			$file_path = $folder . $id . '_img.' . $file_extension;
+			if (is_file($file_path)) {
+				unlink($file_path);
+			}
+		}
+	
+		if (empty($id)) {
+			$save = $this->db->query("INSERT INTO articles (title, content, linkname, img) VALUES ('$title', '$content', '$linkname' , '$file_path')");
+			if ($save) {
 				$id = $this->db->insert_id;
-				$folder = "assets/uploads/gallery/";
-				$file = explode('.',$_FILES['img']['name']);
-				$file = end($file);
-				if(is_file($folder.$id.'/_img'.'.'.$file))
-					unlink($folder.$id.'/_img'.'.'.$file);
-				if(isset($img[$id]))
-						unlink($folder.$img[$id]);
-				if($_FILES['img']['tmp_name'] != ''){
-					$fname = $id.'_img'.'.'.$file;
-					$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/gallery/'. $fname);
+				if ($_FILES['img']['tmp_name'] != '') {
+					$fname = $id . '_img.' . $file_extension;
+					$move = move_uploaded_file($_FILES['img']['tmp_name'], $folder . $fname);
+					$this->db->query("UPDATE articles SET img = '$folder$fname' WHERE id = $id");
 				}
 			}
-		}else{
-			$save = $this->db->query("UPDATE gallery set about = '$about' where id=".$id);
-			if($save){
-				if($_FILES['img']['tmp_name'] != ''){
-					$folder = "assets/uploads/gallery/";
-					$file = explode('.',$_FILES['img']['name']);
-					$file = end($file);
-					if(is_file($folder.$id.'/_img'.'.'.$file))
-						unlink($folder.$id.'/_img'.'.'.$file);
-					if(isset($img[$id]))
-						unlink($folder.$img[$id]);
-					$fname = $id.'_img'.'.'.$file;
-					$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/gallery/'. $fname);
-				}
+		} else {
+			$save = $this->db->query("UPDATE articles SET title = '$title', content = '$content', linkname = '$linkname', img = '$file_path' WHERE id = $id");
+			if ($save && $_FILES['img']['tmp_name'] != '') {
+				$fname = $id . '_img.' . $file_extension;
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], $folder . $fname);
+				$this->db->query("UPDATE articles SET img = '$folder$fname' WHERE id = $id");
 			}
 		}
-		if($save)
+		if ($save) {
 			return 1;
+		}
 	}
-	function delete_gallery(){
+	function delete_article() {
 		extract($_POST);
-		$delete = $this->db->query("DELETE FROM gallery where id = ".$id);
-		if($delete){
+		$article = $this->db->query("SELECT img FROM articles WHERE id = $id")->fetch_assoc();
+		$delete = $this->db->query("DELETE FROM articles WHERE id = $id");
+		if ($delete) {
+			if (isset($article['img']) && is_file($article['img'])) {
+				unlink($article['img']);
+			}
 			return 1;
 		}
 	}
+	
 	function save_career(){
 		extract($_POST);
 		$data = " company = '$company' ";
