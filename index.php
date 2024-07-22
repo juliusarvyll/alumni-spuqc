@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php
-session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-?>
+    <?php
+    session_start();
+    include('admin/db_connect.php');
+    ob_start();
+        $query = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
+         foreach ($query as $key => $value) {
+          if(!is_numeric($key))
+            $_SESSION['system'][$key] = $value;
+        }
+    ob_end_flush();
+    include('header.php');
 
-<style>
-    body {
-        background-color: #f8f9fa;
+	
+    ?>
+
+    <style>
+
+body {
         color: #343a40;
         font-family: 'Arial', sans-serif;
     }
@@ -24,6 +33,17 @@ ini_set('display_errors', 1);
         background-color: #025F1D;
     }
 
+    nav .navbar {
+        padding:100rem;
+        width: 100%;
+        background-color: #ffffff;
+        color: #343a40;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        transition: height 0.3s ease-out;
+        display: flex;
+        align-items: center;
+    }
     nav .navbar {
         padding:100rem;
         width: 100%;
@@ -123,9 +143,9 @@ ini_set('display_errors', 1);
             align-items: center !important;
             text-align: center !important;
         }
-    }
+      }
 
-    @media (max-width: 576px) {
+      @media (max-width: 576px) {
         .navbar img {
             width: 12rem;
             margin-left: 1rem;
@@ -161,56 +181,55 @@ ini_set('display_errors', 1);
         .navbar button {
             color: #36B722;
         }
-
-
-
-    }
-
-    #viewer_modal .btn-close {
-        position: absolute;
-        z-index: 999999;
-        /*right: -4.5em;*/
-        background: unset;
-        color: white;
-        border: unset;
-        font-size: 27px;
-        top: 0;
-    }
-
-    #viewer_modal .modal-dialog {
+      }
+    
+  #viewer_modal .btn-close {
+    position: absolute;
+    z-index: 999999;
+    /*right: -4.5em;*/
+    background: unset;
+    color: white;
+    border: unset;
+    font-size: 27px;
+    top: 0;
+}
+#viewer_modal .modal-dialog {
         width: 80%;
-        max-width: unset;
-        height: calc(90%);
-        max-height: unset;
-    }
+    max-width: unset;
+    height: calc(90%);
+    max-height: unset;
+}
+  #viewer_modal .modal-content {
+       background: black;
+    border: unset;
+    height: calc(100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #viewer_modal img,#viewer_modal video{
+    max-height: calc(100%);
+    max-width: calc(100%);
+}
+ 
 
-    #viewer_modal .modal-content {
-        background: black;
-        border: unset;
-        height: calc(100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #viewer_modal img,
-    #viewer_modal video {
-        max-height: calc(100%);
-        max-width: calc(100%);
-    }
-
-
-</style>
-
-<body id="page-top">
-    <!-- Navigation-->
-    <div class="toast" id="alert_toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body  ">
+a.jqte_tool_label.unselectable {
+    height: auto !important;
+    min-width: 4rem !important;
+    padding:5px
+}/*
+a.jqte_tool_label.unselectable {
+    height: 22px !important;
+}*/
+    </style>
+    <body id="page-top">
+        <!-- Navigation-->
+        <div class="toast" id="alert_toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body text-white">
         </div>
-    </div>
-    <div class="greentop"></div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+      </div>
+      <div class="greentop"></div>
+      <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="./">
         <img src="assets/img/Logo.png" alt="logo">
     </a>
@@ -224,13 +243,10 @@ ini_set('display_errors', 1);
                     <a class="nav-link" href="index.php?page=home">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="index.php?page=alumni_list">Alumni</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="index.php?page=articles">Article</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="index.php?page=careers">Events</a>
+                    <a class="nav-link" href="index.php?page=careers">Jobs</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=forum">Forums</a>
@@ -254,120 +270,73 @@ ini_set('display_errors', 1);
         </div>
     <?php endif; ?>
 </nav>
-     
-   
-    <?php 
-        $page = isset($_GET['page']) ? $_GET['page'] : "home";
-    ?>
-    <?php if (isset($_SESSION['login_id'])):
-        $allowed_pages = ['home', 'alumni_list', 'articles', 'careers', 'forum', 'about', 'my_account', 'contact_us', 'signup', ''];
-        if (in_array($page, $allowed_pages) && file_exists($page . '.php')) {
-            include $page . '.php';
-        } else {
-            include '404.php';
-        }
-    else:
-        if ($page === 'signup') {
-            include "signup.php";
-        } else {
-            include "not_member.php";
-        }
-    endif; ?>
+       
+        <?php 
+        $page = isset($_GET['page']) ?$_GET['page'] : "home";
+        include $page.'.php';
+        ?>
+        
+       <?php include('footer.php') ?>
+    </body>
+    <script type="text/javascript">
+      $('#login').click(function(){
+        uni_modal("Login",'login.php')
+      })
+    </script>
+    <?php $conn->close() ?>
 
-    <div class="modal fade" id="confirm_modal" role='dialog'>
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmation</h5>
-                </div>
-                <div class="modal-body">
-                    <div id="delete_content"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id='confirm' onclick="">Continue</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
+</html>
+<div class="modal fade" id="confirm_modal" role='dialog'>
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+      </div>
+      <div class="modal-body">
+        <div id="delete_content"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='confirm' onclick="">Continue</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+      </div>
     </div>
-    <div class="modal fade" id="uni_modal" role='dialog'>
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"></h5>
-                </div>
-                <div class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id='submit'
-                        onclick="$('#uni_modal form').submit()">Save</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="modal fade" id="uni_modal" role='dialog'>
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title"></h5>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+      </div>
     </div>
-    <div class="modal fade" id="uni_modal_right" role='dialog'>
-        <div class="modal-dialog modal-full-height  modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span class="fa fa-arrow-righ t"></span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="modal fade" id="uni_modal_right" role='dialog'>
+    <div class="modal-dialog modal-full-height  modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="fa fa-arrow-righ t"></span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+      </div>
     </div>
-    <div class="modal fade" id="viewer_modal" role='dialog'>
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-                <button type="button" class="btn-close" data-dismiss="modal"><span class="fa fa-times"></span></button>
-                <img src="" alt="">
-            </div>
-        </div>
+  </div>
+  <div class="modal fade" id="viewer_modal" role='dialog'>
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+              <button type="button" class="btn-close" data-dismiss="modal"><span class="fa fa-times"></span></button>
+              <img src="" alt="">
+      </div>
     </div>
-
-    <?php
-
-    include ('admin/db_connect.php');
-    ob_start();
-    $query = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
-    foreach ($query as $key => $value) {
-        if (!is_numeric($key))
-            $_SESSION['system'][$key] = $value;
-    }
-    ob_end_flush();
-    include ('header.php');
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Retrieve form data
-        $name = $_POST['name'];
-        $message = $_POST['message'];
-
-        // Prepare and execute SQL query to insert form data into a table
-        $sql = "INSERT INTO form_data (name, message) VALUES ('$name', '$message')";
-        if ($conn->query($sql) === TRUE) {
-
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-
-        $conn->close();
-
-    }
-    ?>
-    <div id="preloader"></div>
-
-
-    <?php include ('footer.php') ?>
-</body>
-<script type="text/javascript">
-    $('#login').click(function () {
-        uni_modal("Login", 'login.php')
-    })
-</script>
-<script>
-
-</script>
+  </div>
+  <div id="preloader"></div>

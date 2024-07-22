@@ -112,16 +112,23 @@ Class Action {
 		if($delete)
 			return 1;
 	}
-	function signup(){
+	function signup() {
 		extract($_POST);
+		
+		// Check if avatar is set, if not, assign a default value
+		$avatar = isset($_FILES['avatar']) ? $_FILES['avatar']['name'] : ''; // Assuming avatar is uploaded via a file input
+	
 		$data = " name = '".$firstname.' '.$lastname."' ";
 		$data .= ", username = '$email' ";
 		$data .= ", password = '".md5($password)."' ";
+		
+		// Check if username already exists
 		$chk = $this->db->query("SELECT * FROM users WHERE username = '$email'")->num_rows;
 		if ($chk > 0) {
 			return 2; // Username already exists
-			exit;
 		}
+	
+		// Insert user data
 		$save = $this->db->query("INSERT INTO users SET $data");
 		if ($save) {
 			$uid = $this->db->insert_id;
@@ -132,8 +139,10 @@ Class Action {
 							 kinderSchool = '$kinderSchool', gradeSchool = '$gradeSchool', gradeSchoolYear = '$gradeSchoolYear',
 							 juniorHighSchool = '$juniorHighSchool',juniorHighSchoolYear = '$juniorHighSchoolYear', college = '$college',
 							 collegeYear = '$collegeYear', postGrad = '$postGrad', postGradYear = '$postGradYear'";
+			
 			$insert_query = "INSERT INTO alumnus_bio SET $alumnus_data";
 			$this->db->query($insert_query);
+			
 			if ($this->db->affected_rows > 0) {
 				$aid = $this->db->insert_id;
 				$this->db->query("UPDATE users SET alumnus_id = $aid WHERE id = $uid");
@@ -141,7 +150,7 @@ Class Action {
 				if ($login) return 1;
 			}
 		}
-		return 0;
+		return 0; // Failure
 	}
 	
 	function update_account(){

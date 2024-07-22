@@ -2,24 +2,168 @@
 <html lang="en">
 <?php
 session_start();
-include ('admin/db_connect.php');
-ob_start();
-$query = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
-foreach ($query as $key => $value) {
-    if (!is_numeric($key))
-        $_SESSION['system'][$key] = $value;
-}
-ob_end_flush();
-include ('header.php');
-
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ?>
 
 <style>
-    header.masthead {
-        background: url(admin/assets/uploads/<?php echo $_SESSION['system']['cover_img'] ?>);
-        background-repeat: no-repeat;
-        background-size: cover;
+    body {
+        background-color: #f8f9fa;
+        color: #343a40;
+        font-family: 'Arial', sans-serif;
+    }
+
+    body ul,
+    li {
+        list-style-type: none;
+    }
+
+    .greentop {
+        width: 100%;
+        height: 3.3rem;
+        background-color: #025F1D;
+    }
+
+    nav .navbar {
+        padding:100rem;
+        width: 100%;
+        background-color: #ffffff;
+        color: #343a40;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        transition: height 0.3s ease-out;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar .navbar-brand {
+        position: absolute;
+        top: -30px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    @keyframes slideIn {
+        0% {
+            margin-left: -50rem;
+        }
+
+        100% {
+            margin-left: 10rem;
+        }
+    }
+
+    .navbar img {
+        position: relative;
+        margin-left: -100px;
+        top: .2rem;
+        width: 20rem;
+        animation: slideIn 2s ease-in-out forwards;
+    }
+
+    .navbar .nav-link {
+        padding: 10px 20px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #343a40;
+        display: inline-block;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+        background-color: #ffffff;
+    }
+
+    .navbar-nav {
+        padding-left: 10rem;
+    }
+
+    .navbar-nav-center {
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content {
+        padding: 20px;
+        margin-top: 60px;
+    }
+
+    @media (max-width: 990px) {
+        .navbar img {
+            margin-left: 1.5rem;
+        }
+
+        .navbar-nav-center {
+            justify-content: center;
+        }
+
+        .navbar-nav {
+            margin-top: 2rem;
+            padding-left: 0;
+
+        }
+
+        .navbar {
+            height: 6.3rem;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            0% {
+                margin-left: -50rem;
+            }
+
+            100% {
+                margin-left: 1.5rem;
+            }
+        }
+
+        .hero-left {
+            align-items: center !important;
+            text-align: center !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .navbar img {
+            width: 12rem;
+            margin-left: 1rem;
+            top: 14px;
+
+        }
+
+        .navbar {
+            height: 4rem;
+
+        }
+
+        .navbar-nav {
+            margin-top: 1.2rem;
+        }
+
+        .greentop {
+            height: 3.5rem;
+        }
+
+        @keyframes slideIn {
+            0% {
+                margin-left: -50rem;
+                /* Start position off the screen to the left */
+            }
+
+            100% {
+                margin-left: 1rem;
+                /* End position where you want the logo to settle */
+            }
+        }
+
+        .navbar button {
+            color: #36B722;
+        }
+
+
+
     }
 
     #viewer_modal .btn-close {
@@ -55,82 +199,77 @@ include ('header.php');
         max-width: calc(100%);
     }
 
-    body,
-    footer {
-        background: #000000e6 !important;
-    }
 
-
-    a.jqte_tool_label.unselectable {
-        height: auto !important;
-        min-width: 4rem !important;
-        padding: 5px
-    }
-
-    /*
-a.jqte_tool_label.unselectable {
-    height: 22px !important;
-}*/
 </style>
 
 <body id="page-top">
     <!-- Navigation-->
     <div class="toast" id="alert_toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body text-white">
+        <div class="toast-body  ">
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand js-scroll-trigger" href="./"><?php echo $_SESSION['system']['name'] ?></a>
-
-            <?php if (isset($_SESSION['login_id'])): ?>
-                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-                    data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
-                    aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ml-auto my-2 my-lg-0">
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=home">Home</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger"
-                                href="index.php?page=alumni_list">Alumni</a></li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=gallery">Gallery</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=careers">Jobs</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=forum">Forums</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="index.php?page=about">About</a>
-                    </li>
-                    <?php endif; ?>
-                  
-                    <?php if (!isset($_SESSION['login_id'])): ?>
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#" id="login">Login</a></li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <div class=" dropdown mr-4">
-                                <a href="#" class="nav-link js-scroll-trigger" id="account_settings" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false"><?php echo $_SESSION['login_name'] ?> <i
-                                        class="fa fa-angle-down"></i></a>
-                                <div class="dropdown-menu" aria-labelledby="account_settings" style="left: -2.5em;">
-                                    <a class="dropdown-item" href="index.php?page=my_account" id="manage_my_account"><i
-                                            class="fa fa-cog"></i> Manage Account</a>
-                                    <a class="dropdown-item" href="admin/ajax.php?action=logout2"><i
-                                            class="fa fa-power-off"></i> Logout</a>
-                                </div>
-                            </div>
-                        </li>
-                    <?php endif; ?>
-
-
-                </ul>
-            </div>
+    <div class="greentop"></div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="./">
+        <img src="assets/img/Logo.png" alt="logo">
+    </a>
+    <?php if (isset($_SESSION['login_id'])): ?>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=articles">Article</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=careers">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=forum">Forums</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php?page=contact_us">Contact Us</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="account_settings" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <?php echo $_SESSION['login_name'] ?>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="account_settings">
+                        <a class="dropdown-item" href="index.php?page=my_account" id="manage_my_account">Manage Account</a>
+                        <a class="dropdown-item" href="admin/ajax.php?action=logout2">Logout</a>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </nav>
-
-    <?php
-    $page = isset($_GET['page']) ? $_GET['page'] : "home";
-    include $page . '.php';
+    <?php endif; ?>
+</nav>
+     
+   
+    <?php 
+        $page = isset($_GET['page']) ? $_GET['page'] : "home";
     ?>
-
+    <?php if (isset($_SESSION['login_id'])):
+        $allowed_pages = ['home', 'alumni_list', 'articles', 'careers', 'forum', 'about', 'my_account', 'contact_us', 'signup', ''];
+        if (in_array($page, $allowed_pages) && file_exists($page . '.php')) {
+            include $page . '.php';
+        } else {
+            include '404.php';
+        }
+    else:
+        if ($page === 'signup') {
+            include "signup.php";
+        } else {
+            include "not_member.php";
+        }
+    endif; ?>
 
     <div class="modal fade" id="confirm_modal" role='dialog'>
         <div class="modal-dialog modal-md" role="document">
@@ -186,34 +325,38 @@ a.jqte_tool_label.unselectable {
             </div>
         </div>
     </div>
+
+    <?php
+
+    include ('admin/db_connect.php');
+    ob_start();
+    $query = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
+    foreach ($query as $key => $value) {
+        if (!is_numeric($key))
+            $_SESSION['system'][$key] = $value;
+    }
+    ob_end_flush();
+    include ('header.php');
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Retrieve form data
+        $name = $_POST['name'];
+        $message = $_POST['message'];
+
+        // Prepare and execute SQL query to insert form data into a table
+        $sql = "INSERT INTO form_data (name, message) VALUES ('$name', '$message')";
+        if ($conn->query($sql) === TRUE) {
+
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $conn->close();
+
+    }
+    ?>
     <div id="preloader"></div>
-    <footer class=" py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 text-center">
-                    <h2 class="mt-0 text-white">Contact us</h2>
-                    <hr class="divider my-4" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 ml-auto text-center mb-5 mb-lg-0">
-                    <i class="fas fa-phone fa-3x mb-3 text-muted"></i>
-                    <div class="text-white"><?php echo $_SESSION['system']['contact'] ?></div>
-                </div>
-                <div class="col-lg-4 mr-auto text-center">
-                    <i class="fas fa-envelope fa-3x mb-3 text-muted"></i>
-                    <!-- Make sure to change the email address in BOTH the anchor text and the link target below!-->
-                    <a class="d-block"
-                        href="mailto:<?php echo $_SESSION['system']['email'] ?>"><?php echo $_SESSION['system']['email'] ?></a>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="container">
-            <div class="small text-center text-muted">Copyright © 2020 - <?php echo $_SESSION['system']['name'] ?> | <a
-                    href="https://www.sourcecodester.com/" target="_blank">Sourcecodester</a></div>
-        </div>
-    </footer>
+
 
     <?php include ('footer.php') ?>
 </body>
@@ -222,6 +365,6 @@ a.jqte_tool_label.unselectable {
         uni_modal("Login", 'login.php')
     })
 </script>
-<?php $conn->close() ?>
+<script>
 
-</html>
+</script>
