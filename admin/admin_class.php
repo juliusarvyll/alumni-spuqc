@@ -118,9 +118,14 @@ Class Action {
 		// Check if avatar is set, if not, assign a default value
 		$avatar = isset($_FILES['avatar']) ? $_FILES['avatar']['name'] : ''; // Assuming avatar is uploaded via a file input
 	
-		$data = " name = '".$firstname.' '.$lastname."' ";
+		// Determine employment status
+		$currentlyEmployed = isset($_POST['currentlyEmployed']) ? 1 : 0;
+	
+		// Prepare user data
+		$data = "name = '".$firstname.' '.$lastname."' ";
 		$data .= ", username = '$email' ";
 		$data .= ", password = '".md5($password)."' ";
+		
 		
 		// Check if username already exists
 		$chk = $this->db->query("SELECT * FROM users WHERE username = '$email'")->num_rows;
@@ -130,25 +135,57 @@ Class Action {
 	
 		// Insert user data
 		$save = $this->db->query("INSERT INTO users SET $data");
-		if ($save) {
-			$uid = $this->db->insert_id;
-			$alumnus_data = "firstname = '$firstname', middlename = '$middlename', lastname = '$lastname', 
-							 gender = '$gender', batch = '$batch', course_id = '$course_id', 
-							 email = '$email', connected_to = '$connected_to', avatar = '$avatar', 
-							 status = '1' , studentId = '$studentId', homeAddress = '$homeAddress', mobileNumber = '$mobileNumber',
-							 kinderSchool = '$kinderSchool', gradeSchool = '$gradeSchool', gradeSchoolYear = '$gradeSchoolYear',
-							 juniorHighSchool = '$juniorHighSchool',juniorHighSchoolYear = '$juniorHighSchoolYear', college = '$college',
-							 collegeYear = '$collegeYear', postGrad = '$postGrad', postGradYear = '$postGradYear'";
-			
-			$insert_query = "INSERT INTO alumnus_bio SET $alumnus_data";
-			$this->db->query($insert_query);
-			
-			if ($this->db->affected_rows > 0) {
-				$aid = $this->db->insert_id;
-				$this->db->query("UPDATE users SET alumnus_id = $aid WHERE id = $uid");
-				$login = $this->login2();
-				if ($login) return 1;
-			}
+		if (!$save) {
+			die("Error inserting user: " . $this->db->error); // Output the SQL error
+		}
+	
+		$uid = $this->db->insert_id;
+	
+		// Prepare alumnus data
+		$alumnus_data = "firstname = '$firstname', 
+						 middlename = '$middlename', 
+						 lastname = '$lastname', 
+						 gender = '$gender', 
+						 batch = '$batch', 
+						 course_id = '$course_id', 
+						 email = '$email', 
+						 connected_to = '$connected_to', 
+						 currentlyEmployed = '$currentlyEmployed',
+						 status = '1',
+						 img = 'img',
+						 studentId = '$studentId', 
+						 homeAddress = '$homeAddress', 
+						 mobileNumber = '$mobileNumber',
+						 occupation = '$occupation', 
+						 company = '$company', 
+						 linkedin = '$linkedin',
+						 contact_method = '$contact_method',
+						 interests = '$interests',
+						 kinderSchool = '$kinderSchool', 
+						 kinderYear = '$kinderYear',
+						 gradeSchool = '$gradeSchool', 
+						 gradeSchoolYear = '$gradeSchoolYear',
+						 juniorHighSchool = '$juniorHighSchool', 
+						 juniorHighSchoolYear = '$juniorHighSchoolYear', 
+						 college = '$college',
+						 collegeYear = '$collegeYear', 
+						 postGrad = '$postGrad', 
+						 postGradYear = '$postGradYear',
+						 programs = '".json_encode($programs)."',
+						 consent = '$consent'";
+	
+	
+		$insert_query = "INSERT INTO alumnus_bio SET $alumnus_data"; // Print the SQL query for debugging
+		$save_alumnus = $this->db->query($insert_query);
+		if (!$save_alumnus) {
+			die("Error inserting alumnus data: " . $this->db->error); // Output the SQL error
+		}
+	
+		if ($this->db->affected_rows > 0) {
+			$aid = $this->db->insert_id;
+			$this->db->query("UPDATE users SET alumnus_id = $aid WHERE id = $uid");
+			$login = $this->login2();
+			if ($login) return 1;
 		}
 		return 0; // Failure
 	}

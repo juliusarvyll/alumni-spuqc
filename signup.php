@@ -7,16 +7,15 @@ include 'admin/db_connect.php';
         max-width: 6vw;
     }
 </style>
-    <div class="container-fluid">
-        <div class="row h-100 align-items-center justify-content-center text-center">
-            <div class="col-lg-8 align-self-end mb-4 page-title">
-                <h3 class=" ">Create Account</h3>
-                <hr class="divider my-4" />
-                <div class="col-md-12 mb-2 justify-content-center">
-                </div>                        
-            </div>
+<div class="container-fluid">
+    <div class="row h-100 align-items-center justify-content-center text-center">
+        <div class="col-lg-8 align-self-end mb-4 page-title">
+            <h3 class=" ">Create Account</h3>
+            <hr class="divider my-4" />
+            <div class="col-md-12 mb-2 justify-content-center"></div>
         </div>
     </div>
+</div>
 <div class="container mt-3 pt-2">
     <div class="col-lg-12">
         <div class="card mb-4">
@@ -35,7 +34,7 @@ include 'admin/db_connect.php';
                                 </div>
                                 <div class="col-md-4">
                                     <label for="" class="control-label">Middle Name</label>
-                                    <input type="text" class="form-control" name="middlename" >
+                                    <input type="text" class="form-control" name="middlename">
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -72,7 +71,7 @@ include 'admin/db_connect.php';
                                     <label for="" class="control-label">Image</label>
                                     <input type="file" class="form-control" name="img" onchange="displayImg(this,$(this))">
                                     <img src="" alt="" id="cimg">
-                                </div>  
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
@@ -98,6 +97,48 @@ include 'admin/db_connect.php';
                                 <div class="col-md-4">
                                     <label for="" class="control-label">Mobile Number</label>
                                     <input type="tel" class="form-control" name="mobileNumber" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    <label for="" class="control-label">Currently Employed</label>
+                                    <input type="checkbox" id="currentlyEmployed" name="currentlyEmployed">
+                                    <input type="hidden" id="currentlyEmployedHidden" name="currentlyEmployedHidden" value="0">
+                                </div>
+                            </div>
+                            <div id="employmentDetails" style="display: none;">
+                                <div class="row form-group">
+                                    <div class="col-md-6">
+                                        <label for="" class="control-label">Job Title</label>
+                                        <input type="text" class="form-control" name="occupation" id="occupation">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="" class="control-label">Company/Organization</label>
+                                        <input type="text" class="form-control" name="company" id="company">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    <label for="" class="control-label">LinkedIn Profile</label>
+                                    <input type="url" class="form-control" name="linkedin">
+                                </div>
+                                        </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    <label for="" class="control-label">Preferred Contact Method</label>
+                                    <select class="custom-select" name="contact_method">
+                                        <option>Email</option>
+                                        <option>Phone</option>
+                                        <option>Mail</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-10">
+                                    <label for="" class="control-label">Interests/Hobbies</label>
+                                    <textarea name="interests" class="form-control" rows="3"></textarea>
                                 </div>
                             </div>
 
@@ -193,6 +234,8 @@ include 'admin/db_connect.php';
                                 </div>
                             </div>
 
+                            <!-- Additional Fields -->
+
                             <!-- Consent Statement -->
                             <div class="row form-group">
                                 <div class="col-md-12">
@@ -247,47 +290,43 @@ include 'admin/db_connect.php';
         }
    }
    document.addEventListener('DOMContentLoaded', function() {
-        let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        let maxSelections = 6;
+        let employedCheckbox = document.getElementById('currentlyEmployed');
+        let employmentDetails = document.getElementById('employmentDetails');
+        let occupationField = document.getElementById('occupation');
+        let companyField = document.getElementById('company');
+        let employedHidden = document.getElementById('currentlyEmployedHidden');
 
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                let checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
-                if (checkedCount > maxSelections) {
-                    this.checked = false;
-                    alert(`You can select up to ${maxSelections} options only.`);
-                }
-            });
+        employedCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                employmentDetails.style.display = 'block';
+                employedHidden.value = '1';
+            } else {
+                employmentDetails.style.display = 'none';
+                occupationField.value = '';
+                companyField.value = '';
+                employedHidden.value = '0';
+            }
         });
     });
 
-    $('#create_account').submit(function(e) {
-    e.preventDefault(); // Prevent the default form submission
-    start_load(); // Optional: Start a loading animation
-
+    $('#create_account').submit(function(e){
+    e.preventDefault();
+    start_load();
     $.ajax({
-        url: 'admin/ajax.php?action=signup', // Correct endpoint
-        data: new FormData(this), // Use 'this' to refer to the form
+        url: 'admin/ajax.php?action=signup',
+        data: new FormData($(this)[0]),
         cache: false,
         contentType: false,
         processData: false,
         method: 'POST',
-        success: function(resp) {
+        type: 'POST',
+        success: function(resp){
             if (resp == 1) {
-                alert_toast("Signup successful!", 'success'); // Success message
-                setTimeout(function() {
-                    location.replace('index.php'); // Redirect on success
-                }, 1500); // Delay for the toast message to show
-            } else if (resp == 2) {
-                $('#msg').html('<div class="alert alert-danger">Username already exists.</div>'); // Show error message
+                location.replace('index.php');
             } else {
-                $('#msg').html('<div class="alert alert-danger">Signup failed. Please try again.</div>'); // General error message
+                $('#msg').html('<div class="alert alert-danger">' + resp + '</div>');
+                end_load();
             }
-            end_load(); // Optional: End loading animation
-        },
-        error: function() {
-            $('#msg').html('<div class="alert alert-danger">An error occurred. Please try again.</div>'); // Handle AJAX error
-            end_load(); // End loading animation
         }
     });
 });

@@ -16,15 +16,45 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
-                        <div class="col-md-4">
+                        <!-- Existing Filters -->
+                        <div class="col-md-2">
                             <select id="courseFilter" class="form-control">
                                 <option value="">Select Course</option>
                                 <?php 
                                 $courses = $conn->query("SELECT * FROM courses ORDER BY course ASC");
-                                while ($row = $courses->fetch_assoc()):
+                                while ($row = $courses->fetch_assoc()): // Correctly fetch data into $row
                                 ?>
                                 <option value="<?php echo $row['id']; ?>"><?php echo $row['course']; ?></option>
                                 <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="genderFilter" class="form-control">
+                                <option value="">Select Gender</option>
+                                <?php 
+                                $genders = $conn->query("SELECT DISTINCT gender FROM alumnus_bio ORDER BY gender");
+                                while ($row = $genders->fetch_assoc()): // Correctly fetch data into $row
+                                ?>
+                                <option value="<?php echo $row['gender']; ?>"><?php echo $row['gender']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="batchFilter" class="form-control">
+                                <option value="">Select Batch</option>
+                                <?php 
+                                $batches = $conn->query("SELECT DISTINCT batch FROM alumnus_bio ORDER BY batch");
+                                while ($row = $batches->fetch_assoc()): // Correctly fetch data into $row
+                                ?>
+                                <option value="<?php echo $row['batch']; ?>"><?php echo $row['batch']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="employedFilter" class="form-control">
+                                <option value="">Select Employment Status</option>
+                                <option value="1">Employed</option>
+                                <option value="0">Unemployed</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -38,6 +68,11 @@
                                 <th class="">Avatar</th>
                                 <th class="">Name</th>
                                 <th class="">Course Graduated</th>
+                                <th class="">Year of Graduation</th>
+                                <th class="">Email</th>
+                                <th class="">Phone Number</th>
+                                <th class="">Occupation</th>
+                                <th class="">Company</th>
                                 <th class="">Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -45,14 +80,24 @@
                         <tbody id="alumniList">
                             <?php 
                             $i = 1;
-                            $alumni = $conn->query("SELECT a.*, c.course, CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) as name FROM alumnus_bio a INNER JOIN courses c ON c.id = a.course_id ORDER BY CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) ASC");
-                            while ($row = $alumni->fetch_assoc()):
+                            $alumni = $conn->query("SELECT a.*, c.course, CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) as name 
+                                                    FROM alumnus_bio a 
+                                                    INNER JOIN courses c ON c.id = a.course_id 
+                                                    ORDER BY CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) ASC");
+                            while ($row = $alumni->fetch_assoc()): // Correctly fetch data into $row
                             ?>
                             <tr>
                                 <td class="text-center"><?php echo $i++; ?></td>
                                 <td class="text-center">
                                     <div class="avatar">
-                                        <img src="assets/uploads/<?php echo $row['avatar']; ?>" alt="">
+                                        <?php 
+                                        // Debugging: Check the length of the image data
+                                        if (!empty($row['img'])) {
+                                            echo '<img src="data:image/png;base64,'.base64_encode($row['img']).'" alt="Avatar">'; 
+                                        } else {
+                                            echo 'No image available'; // Debugging message
+                                        }
+                                        ?>
                                     </div>
                                 </td>
                                 <td>
@@ -60,6 +105,21 @@
                                 </td>
                                 <td>
                                     <p><b><?php echo $row['course']; ?></b></p>
+                                </td>
+                                <td>
+                                    <p><b><?php echo $row['batch']; ?></b></p>
+                                </td>
+                                <td>
+                                    <p><b><?php echo $row['email']; ?></b></p>
+                                </td>
+                                <td>
+                                    <p><b><?php echo $row['mobileNumber']; ?></b></p>
+                                </td>
+                                <td>
+                                    <p><b><?php echo $row['occupation']; ?></b></p>
+                                </td>
+                                <td>
+                                    <p><b><?php echo $row['company']; ?></b></p>
                                 </td>
                                 <td class="text-center">
                                     <?php if ($row['status'] == 1): ?>
@@ -107,35 +167,84 @@
 </style>
 
 <script>
-    $(document).ready(function() {
-        $('table').dataTable();
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#alumniTable').DataTable();
+
+    // Filter by Course
+    $('#courseFilter').change(function() {
+        filterTable();
     });
 
-    $('#courseFilter').change(function() {
-        var course_id = $(this).val();
+    // Filter by Gender
+    $('#genderFilter').change(function() {
+        filterTable();
+    });
+
+    // Filter by Batch
+    $('#batchFilter').change(function() {
+        filterTable();
+    });
+
+    // Filter by Employment Status
+    $('#employedFilter').change(function() {
+        filterTable();
+    });
+
+    // Download PDF
+    $('#downloadPdf').click(function() {
+        var course_id = $('#courseFilter').val();
+        var gender = $('#genderFilter').val();
+        var batch = $('#batchFilter').val();
+        var status = $('#employedFilter').val();
+        window.location.href = 'generate_pdf.php?course_id=' + course_id + '&gender=' + gender + '&batch=' + batch + '&status=' + status;
+    });
+
+    // Filter table function
+    function filterTable() {
+        var course_id = $('#courseFilter').val();
+        var gender = $('#genderFilter').val();
+        var batch = $('#batchFilter').val();
+        var status = $('#employedFilter').val();
+
+        // Debugging: Log the filter values
+        console.log("Filters - Course ID: " + course_id + ", Gender: " + gender + ", Batch: " + batch + ", Status: " + status);
+
         $.ajax({
             url: 'filter_alumni.php',
             method: 'POST',
-            data: { course_id: course_id },
+            data: { course_id: course_id, gender: gender, batch: batch, status: status },
             success: function(data) {
+                // Debugging: Log the response data
+                console.log("Response Data: ", data);
+
+                // Clear the DataTable
+                table.clear().draw();
+
+                // Append the new rows to the table body
                 $('#alumniList').html(data);
+
+                // Reinitialize the DataTable with the new rows
+                table.rows.add($('#alumniList tr')).draw();
+            },
+            error: function(xhr, status, error) {
+                // Debugging: Log any errors
+                console.error("AJAX Error: ", status, error);
             }
         });
-    });
+    }
 
-    $('#downloadPdf').click(function() {
-        var course_id = $('#courseFilter').val();
-        window.location.href = 'generate_pdf.php?course_id=' + course_id;
-    });
-
+    // View Alumni
     $(document).on('click', '.view_alumni', function() {
         uni_modal("Bio", "view_alumni.php?id=" + $(this).data('id'), 'mid-large');
     });
 
+    // Delete Alumni
     $(document).on('click', '.delete_alumni', function() {
         _conf("Are you sure to delete this alumni?", "delete_alumni", [$(this).data('id')]);
     });
 
+    // Delete alumni function
     function delete_alumni(id) {
         start_load();
         $.ajax({
@@ -144,7 +253,7 @@
             data: { id: id },
             success: function(resp) {
                 if (resp == 1) {
-                    alert_toast("Data successfully deleted", 'success');
+                    alert_toast("Alumni successfully deleted.", 'success');
                     setTimeout(function() {
                         location.reload();
                     }, 1500);
@@ -152,4 +261,5 @@
             }
         });
     }
+});
 </script>
