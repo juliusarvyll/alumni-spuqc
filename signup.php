@@ -15,11 +15,10 @@ include 'admin/db_connect.php';
         max-width: 6vw;
     }
 </style>
-        <header class="masthead">
-            <div class="container-fluid h-100">
+            <div class="container-fluid mt-5">
                 <div class="row h-100 align-items-center justify-content-center text-center">
                     <div class="col-lg-8 align-self-end mb-4 page-title">
-                    	<h3 class="text-white">Create Account</h3>
+                    	<h3 class=" ">Create Account</h3>
                         <hr class="divider my-4" />
 
                     <div class="col-md-12 mb-2 justify-content-center">
@@ -28,7 +27,7 @@ include 'admin/db_connect.php';
                     
                 </div>
             </div>
-        </header>
+
             <div class="container mt-3 pt-2">
                <div class="col-lg-12">
                    <div class="card mb-4">

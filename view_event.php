@@ -65,18 +65,14 @@ while($row = $commits->fetch_assoc()){
 	}
 	<?php endif; ?>
 </style>
-<header class="masthead">
-	<div class="container-fluid h-100">
+	<div class="container-fluid mt-5">
                 <div class="row h-100 align-items-center justify-content-center text-center">
                     <div class="col-lg-4 align-self-end mb-4 pt-2 page-title">
-                    	<h4 class="text-center text-white"><b><?php echo ucwords($title) ?></b></h4>
-                        <hr class="divider my-4" />
-                     
+                    	<h4 class="text-center  "><b><?php echo ucwords($title) ?></b></h4>
                     </div>
                     
                 </div>
             </div>
-</header>
 <section></section>
 <div class="container">
 	<div class="col-lg-12">

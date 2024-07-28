@@ -54,7 +54,7 @@ header.masthead,header.masthead:before {
     <div class="container-fluid h-100">
         <div class="row h-100 align-items-center justify-content-center text-center">
             <div class="col-lg-8 align-self-end mb-4 page-title">
-                <h3 class="text-white"><?php echo $title ?></h3>
+                <h3 class=" "><?php echo $title ?></h3>
                 <hr class="divider my-4" />
             <div class="row col-md-12 mb-2 justify-content-center">
                    <span class="badge badge-primary px-3 pt-1 pb-1">

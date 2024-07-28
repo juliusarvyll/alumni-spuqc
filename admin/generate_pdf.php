@@ -10,10 +10,13 @@ class MYPDF extends TCPDF {
 
     // Page header
     public function Header() {
-        // Set font
-        $this->SetFont('helvetica', 'B', 20);
-        // Title
-        $this->Cell(0, 15, 'List of Alumni', 0, false, 'C', 0, '', 0, false, 'M', 'M');
+        // Logo
+        $image_file = 'assets/img/logo.png'; // Update this path to your logo file
+        $logo_width = 70; // Width of the logo
+        $page_width = $this->getPageWidth();
+        $logo_x = ($page_width - $logo_width) / 2; // Center the logo
+
+        $this->Image($image_file, $logo_x, 10, $logo_width, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
     }
 
     // Page footer
@@ -41,7 +44,7 @@ $pdf->SetKeywords('TCPDF, PDF, alumni, report');
 $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
 // Set margins
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP + 20, PDF_MARGIN_RIGHT); // Adjust top margin to accommodate logo
 $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
@@ -61,17 +64,19 @@ $pdf->SetFont('helvetica', '', 12);
 $html = '<table border="1" cellpadding="5">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Avatar</th>
                     <th>Name</th>
                     <th>Course Graduated</th>
-                    <th>Status</th>
+                    <th>Year of Graduation</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
                 </tr>
             </thead>
             <tbody>';
 
 $i = 1;
-$query = "SELECT a.*, c.course, CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) as name FROM alumnus_bio a INNER JOIN courses c ON c.id = a.course_id";
+$query = "SELECT a.*, c.course, CONCAT(a.lastname, ', ', a.firstname, ' ', a.middlename) as name 
+          FROM alumnus_bio a 
+          INNER JOIN courses c ON c.id = a.course_id";
 if ($course_id != '') {
     $query .= " WHERE a.course_id = '$course_id'";
 }
@@ -81,11 +86,11 @@ $alumni = $conn->query($query);
 while ($row = $alumni->fetch_assoc()) {
     $status = $row['status'] == 1 ? 'Verified' : 'Not Verified';
     $html .= '<tr>
-                <td>'.$i++.'</td>
-                <td><img src="assets/uploads/'.$row['avatar'].'" width="50" height="50"></td>
                 <td>'.ucwords($row['name']).'</td>
                 <td>'.$row['course'].'</td>
-                <td>'.$status.'</td>
+                <td>'.$row['batch'].'</td>
+                <td>'.$row['email'].'</td>
+                <td>'.$row['mobileNumber'].'</td>
               </tr>';
 }
 

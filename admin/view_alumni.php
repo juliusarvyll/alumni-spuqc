@@ -39,7 +39,7 @@ foreach($qry->fetch_array() as $k => $val){
 		<div>
 			<center>
 				<div class="avatar">
-				 <img src="assets/uploads/<?php echo $avatar ?>" class="" alt="">
+				 <img src="assets/uploads/<?php echo $img ?>">
 				</div>
 			</center>
 		</div>

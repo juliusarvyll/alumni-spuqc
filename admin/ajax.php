@@ -64,13 +64,13 @@ if($action == "update_alumni_acc"){
 	if($save)
 		echo $save;
 }
-if($action == "save_gallery"){
-	$save = $crud->save_gallery();
+if($action == "save_article"){
+	$save = $crud->save_article();
 	if($save)
 		echo $save;
 }
-if($action == "delete_gallery"){
-	$save = $crud->delete_gallery();
+if($action == "delete_article"){
+	$save = $crud->delete_article();
 	if($save)
 		echo $save;
 }

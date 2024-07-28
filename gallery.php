@@ -28,10 +28,7 @@ span.hightlight{
 .carousel,.carousel-inner,.carousel-item{
    min-height: calc(100%)
 }
-header.masthead,header.masthead:before {
-        min-height: 50vh !important;
-        height: 50vh !important
-    }
+
 .row-items{
     position: relative;
 }
@@ -62,7 +59,7 @@ header.masthead,header.masthead:before {
             <div class="container-fluid h-100">
                 <div class="row h-100 align-items-center justify-content-center text-center">
                     <div class="col-lg-8 align-self-end mb-4 page-title">
-                        <h3 class="text-white">Gallery</h3>
+                        <h3 class=" ">Gallery</h3>
                         <hr class="divider my-4" />
 
                     <div class="col-md-12 mb-2 justify-content-center">
