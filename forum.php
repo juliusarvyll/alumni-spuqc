@@ -35,12 +35,22 @@ header.masthead,header.masthead:before {
 .row-items{
     position: relative;
 }
+.masthead{
+        min-height: 23vh !important;
+        height: 23vh !important;
+    }
+     .masthead:before{
+        min-height: 23vh !important;
+        height: 23vh !important;
+    }
 
 </style>
-    <div class="container-fluid">
+<header class="masthead">
+    <div class="container-fluid h-100">
         <div class="row h-100 align-items-center justify-content-center text-center">
             <div class="col-lg-8 align-self-end mb-4 page-title">
-                <h3 class="text-white">Forum List</h3>
+                <h3 class=" ">Forum List</h3>
+                <hr class="divider my-4" />
             <div class="row col-md-12 mb-2 justify-content-center">
                     <button class="btn btn-primary btn-block col-sm-4" type="button" id="new_forum"><i class="fa fa-plus"></i> Create New Topic</button>
             </div>   
@@ -48,6 +58,7 @@ header.masthead,header.masthead:before {
             
         </div>
     </div>
+</header>
 <div class="container mt-3 pt-2">
     <div class="card mb-4">
         <div class="card-body">
